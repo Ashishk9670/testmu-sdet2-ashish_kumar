@@ -1,0 +1,19 @@
+{
+  "defaultAddress": {
+    "firstName": "QA",
+    "lastName": "User",
+    "email": "qa.user123@mailinator.com",
+    "country": "United States",
+    "city": "New York",
+    "addressLine1": "100 Automation Avenue",
+    "postalCode": "10001",
+    "phone": "2125550100"
+  },
+  "payment": {
+    "method": "Check / Money Order",
+    "cardNumber": "4111111111111111",
+    "expiryMonth": "12",
+    "expiryYear": "2030",
+    "cvv": "123"
+  }
+}

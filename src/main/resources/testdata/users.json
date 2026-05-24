@@ -1,0 +1,14 @@
+{
+  "validUser": {
+    "email": "qa.user123@mailinator.com",
+    "password": "Engineer@09876",
+    "firstName": "QA",
+    "lastName": "User"
+  },
+  "invalidUser": {
+    "email": "qa.invalid@mailinator.com",
+    "password": "WrongPassword123",
+    "firstName": "Invalid",
+    "lastName": "User"
+  }
+}

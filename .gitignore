@@ -1,0 +1,10 @@
+target/
+allure-results/*
+allure-report/*
+screenshots/*
+logs/*
+!.gitkeep
+*.log
+.idea/
+.vscode/
+*.iml

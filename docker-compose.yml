@@ -1,0 +1,9 @@
+services:
+  automation:
+    build: .
+    environment:
+      - MAVEN_OPTS=-Xmx1024m
+    command: mvn clean test -Dheadless=true -Dbrowser=chrome
+    volumes:
+      - ./allure-results:/workspace/allure-results
+      - ./screenshots:/workspace/screenshots

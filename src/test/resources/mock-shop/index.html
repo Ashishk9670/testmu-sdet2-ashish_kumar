@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mock Commerce</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 32px; color: #1f2937; }
+        header { display: flex; gap: 16px; align-items: center; margin-bottom: 24px; }
+        a, button { cursor: pointer; }
+        input, select { display: block; margin: 8px 0 14px; padding: 8px; min-width: 280px; }
+        button { padding: 9px 14px; border: 0; background: #166534; color: white; }
+        .button-2 { background: #1d4ed8; }
+        .bar-notification { margin: 16px 0; padding: 12px; background: #dcfce7; color: #166534; display: none; }
+        .message-failure, .validation-summary-errors, .field-validation-error { color: #b91c1c; margin: 12px 0; }
+        .product-item, .cart, .order-list { border: 1px solid #d1d5db; padding: 16px; margin: 12px 0; max-width: 720px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<header>
+    <a class="ico-login" href="#login">Log in</a>
+    <a class="ico-account hidden" href="#account">My account</a>
+    <a class="ico-logout hidden" href="#logout">Log out</a>
+    <a class="ico-cart" href="#cart">Shopping cart</a>
+    <a href="/customer/orders">Orders</a>
+</header>
+
+<main id="app"></main>
+
+<script>
+const app = document.querySelector('#app');
+const state = { loggedIn: false, cart: [] };
+
+function syncHeader() {
+  document.querySelector('.ico-login').classList.toggle('hidden', state.loggedIn);
+  document.querySelector('.ico-account').classList.toggle('hidden', !state.loggedIn);
+  document.querySelector('.ico-logout').classList.toggle('hidden', !state.loggedIn);
+}
+
+function shell(content) {
+  app.innerHTML = `
+    <section class="search-box">
+      <input id="small-searchterms" placeholder="Search store" />
+      <button class="search-box-button">Search</button>
+    </section>
+    <div class="bar-notification success">The product has been added to your shopping cart</div>
+    ${content}`;
+  app.querySelector('.search-box-button').addEventListener('click', () => {
+    location.hash = '#search?q=' + encodeURIComponent(document.querySelector('#small-searchterms').value);
+  });
+}
+
+function renderHome() {
+  shell('<h1>Mock Commerce</h1>');
+}
+
+function renderLogin() {
+  shell(`
+    <form id="login-form">
+      <input id="Email" type="email" placeholder="Email" />
+      <input id="Password" type="password" placeholder="Password" />
+      <button type="submit" class="login-button">Log in</button>
+      <div class="validation-summary-errors"></div>
+    </form>`);
+  document.querySelector('#login-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const email = document.querySelector('#Email').value;
+    const password = document.querySelector('#Password').value;
+    if (email === 'qa.user123@mailinator.com' && password === 'Engineer@09876') {
+      state.loggedIn = true;
+      syncHeader();
+      location.hash = '#home';
+    } else {
+      document.querySelector('.validation-summary-errors').textContent = 'Login was unsuccessful.';
+    }
+  });
+}
+
+function renderSearch() {
+  const term = new URLSearchParams(location.hash.split('?')[1] || '').get('q') || '';
+  const hasResults = term.toLowerCase().includes('computer');
+  shell(`
+    <section class="product-grid">
+      ${hasResults ? `<article class="product-item">
+        <a class="product-name">Build your own computer</a>
+        <button class="button-2 product-box-add-to-cart-button">Add to cart</button>
+      </article>` : ''}
+    </section>`);
+  const button = document.querySelector('.product-box-add-to-cart-button');
+  if (button) {
+    button.addEventListener('click', () => {
+      state.cart = ['Build your own computer'];
+      document.querySelector('.bar-notification.success').style.display = 'block';
+    });
+  }
+}
+
+function renderCart() {
+  shell(`
+    <section class="cart">
+      <a class="product-name">${state.cart[0] || 'Build your own computer'}</a>
+      <input id="discountcouponcode" placeholder="Coupon" />
+      <button id="applydiscountcouponcode">Apply coupon</button>
+      <div class="message-failure"></div>
+      <label><input id="termsofservice" type="checkbox" /> Terms</label>
+      <button id="checkout">Checkout</button>
+    </section>`);
+  document.querySelector('#applydiscountcouponcode').addEventListener('click', () => {
+    document.querySelector('.message-failure').textContent = 'The coupon code you entered could not be applied.';
+  });
+  document.querySelector('#checkout').addEventListener('click', () => location.hash = '#checkout');
+}
+
+function renderCheckout() {
+  shell(`
+    <section id="checkout-page">
+      <input id="BillingNewAddress_FirstName" />
+      <input id="BillingNewAddress_LastName" />
+      <input id="BillingNewAddress_Email" />
+      <select id="BillingNewAddress_CountryId"><option>United States</option></select>
+      <input id="BillingNewAddress_City" />
+      <input id="BillingNewAddress_Address1" />
+      <input id="BillingNewAddress_ZipPostalCode" />
+      <input id="BillingNewAddress_PhoneNumber" />
+      <button name="save" class="new-address-next-step-button">Continue</button>
+      <button class="shipping-method-next-step-button">Continue</button>
+      <button class="payment-method-next-step-button">Continue</button>
+      <button class="payment-info-next-step-button">Continue</button>
+      <button class="confirm-order-next-step-button">Confirm</button>
+      <div class="field-validation-error"></div>
+    </section>`);
+  document.querySelector('.confirm-order-next-step-button').addEventListener('click', () => {
+    const id = localStorage.getItem('apiOrderId') || '10001';
+    localStorage.setItem('lastOrderId', id);
+    location.hash = '#order-complete';
+  });
+}
+
+function renderOrderComplete() {
+  shell(`<section class="section order-completed"><div class="title">Your order has been successfully processed!</div><div class="order-number">Order number: ${localStorage.getItem('lastOrderId') || '10001'}</div></section>`);
+}
+
+function renderOrders() {
+  const id = localStorage.getItem('apiOrderId') || localStorage.getItem('lastOrderId') || '10001';
+  shell(`<section class="order-list"><article>Order Number: ${id}</article></section>`);
+}
+
+function route() {
+  syncHeader();
+  const hash = location.hash || '#home';
+  if (hash.startsWith('#login')) renderLogin();
+  else if (hash.startsWith('#search')) renderSearch();
+  else if (hash.startsWith('#cart')) renderCart();
+  else if (hash.startsWith('#checkout')) renderCheckout();
+  else if (hash.startsWith('#order-complete')) renderOrderComplete();
+  else if (location.pathname.includes('/customer/orders') || hash.startsWith('#account')) renderOrders();
+  else renderHome();
+}
+
+document.body.addEventListener('click', event => {
+  const anchor = event.target.closest('a');
+  if (!anchor) return;
+  if (anchor.classList.contains('ico-cart')) { event.preventDefault(); location.hash = '#cart'; }
+  if (anchor.classList.contains('ico-logout')) { event.preventDefault(); state.loggedIn = false; syncHeader(); location.hash = '#home'; }
+  if (anchor.getAttribute('href') === '/customer/orders') { event.preventDefault(); history.pushState({}, '', '/customer/orders'); renderOrders(); }
+});
+
+window.addEventListener('hashchange', route);
+window.addEventListener('popstate', route);
+route();
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="UI Suite" parallel="false" thread-count="1">
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+        <listener class-name="listeners.AnnotationTransformer"/>
+    </listeners>
+    <parameter name="browser" value="${browser}"/>
+    <parameter name="headless" value="${headless}"/>
+    <test name="UI Tests">
+        <groups>
+            <run>
+                <include name="ui"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="ui"/>
+        </packages>
+    </test>
+</suite>

@@ -1,0 +1,16 @@
+{
+  "computer": {
+    "id": 1,
+    "name": "Computer",
+    "searchTerm": "computer",
+    "price": 1200.00,
+    "quantity": 1
+  },
+  "outOfStockProduct": {
+    "id": 99999,
+    "name": "Limited Edition Workstation",
+    "searchTerm": "limited workstation",
+    "price": 3500.00,
+    "quantity": 1
+  }
+}
