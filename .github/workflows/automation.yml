@@ -27,7 +27,7 @@ jobs:
           cache: maven
 
       - name: Run API tests
-        run: mvn clean test -DsuiteXmlFile=src/test/resources/suites/api-suite.xml -Dheadless=true
+        run: mvn clean test -Dgroups=api -Denv=qa -Dheadless=true
 
       - name: Upload API Allure results
         if: always()
