@@ -14,8 +14,10 @@ import utils.ScreenshotUtils;
 import config.ConfigReader;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class TestListener implements ITestListener, IExecutionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestListener.class);
@@ -48,6 +50,7 @@ public class TestListener implements ITestListener, IExecutionListener {
     public void onTestFailure(ITestResult result) {
         LOGGER.error("Test failed: {}", result.getName(), result.getThrowable());
         Allure.addAttachment("Failure reason", String.valueOf(result.getThrowable()));
+        attachRecentLogs();
         try {
             ScreenshotUtils.capture(result.getName());
             AllureUtils.attachPng("Failure screenshot", ScreenshotUtils.captureBytes());
@@ -59,6 +62,22 @@ public class TestListener implements ITestListener, IExecutionListener {
     @Override
     public void onTestSuccess(ITestResult result) {
         LOGGER.info("Test passed: {}", result.getName());
+    }
+
+    private void attachRecentLogs() {
+        Path logPath = Path.of("logs", "automation.log");
+        if (!Files.exists(logPath)) {
+            return;
+        }
+
+        try {
+            List<String> lines = Files.readAllLines(logPath, StandardCharsets.UTF_8);
+            int start = Math.max(0, lines.size() - 200);
+            String recentLogs = String.join(System.lineSeparator(), lines.subList(start, lines.size()));
+            AllureUtils.attachText("Recent logs", recentLogs);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to attach recent logs", e);
+        }
     }
 
     @Override
